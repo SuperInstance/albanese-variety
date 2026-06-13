@@ -74,6 +74,10 @@ The Albanese variety provides the **geometric invariant theory** foundation for 
 
 See [ARCHITECTURE.md](https://github.com/SuperInstance/SuperInstance/blob/main/ARCHITECTURE.md).
 
+The Albanese variety is constructed via integration of holomorphic 1-forms along 1-cycles. For a curve of genus g, the resulting complex torus ℂ^g / Λ has dimension g. The period matrix Π must satisfy the Riemann bilinear relations for the torus to be an abelian variety (i.e., possess a positive-definite Riemann form). This integrality constraint on the period matrix is the computational bottleneck in explicit Albanese computations for varieties of genus > 3.
+
+**Dual relationship:** The Albanese variety is dual (in the sense of abelian variety duality) to the Picard variety Pic⁰(X), parameterizing divisor classes algebraically equivalent to zero. This Alb(X) ↔ Pic⁰(X) duality is a special case of the more general Fourier-Mukai duality on derived categories.
+
 ## References
 
 1. Birkenhake, C. & Lange, H. (2004). *Complex Abelian Varieties*. 2nd ed. Springer. Chapter 11: Albanese and Picard Variety.
