@@ -1,49 +1,83 @@
 # Albanese Variety
 
-The **Albanese variety** is an abelian variety canonically associated with a smooth projective variety, representing the target of the universal morphism to an abelian variety.
+**Albanese Variety** is a Rust library implementing computational primitives for the Albanese variety — the abelian variety canonically associated to a smooth projective algebraic variety, serving as the universal receiver of regular 1-forms.
 
 ## Why It Matters
 
-In algebraic geometry, the Albanese variety captures the first homology group of a variety. It's the algebraic analogue of the Jacobian of a curve and plays a central role in the classification of algebraic varieties and Hodge theory.
+The Albanese variety is a fundamental construction in algebraic geometry, providing a bridge between the topology of a variety and the theory of abelian varieties. For a smooth projective variety X of dimension n over ℂ, the Albanese variety Alb(X) is an abelian variety of dimension g = h^{1,0}(X) (the genus), equipped with a canonical morphism alb: X → Alb(X) that is universal among morphisms from X to abelian varieties. This universality makes it indispensable in the classification of algebraic varieties, the study of periods and Hodge structures, and arithmetic geometry. The dual relationship between Alb(X) and the Picard variety Pic⁰(X) is a cornerstone of Hodge theory.
 
 ## How It Works
 
-Constructed as the dual of the Picard variety, Alb(X) = Pic⁰(X)∨. For a curve, it coincides with the Jacobian. The implementation computes Albanese via integration of holomorphic 1-forms along cycle paths.
+**Complex Torus Structure:**
+The Albanese variety is constructed as a quotient:
 
-## Usage
-
-```toml
-[dependencies]
-albanese-variety = "0.1.0"
+```
+Alb(X) = H⁰(X, Ω¹)* / H₁(X, ℤ)
 ```
 
-```rust
-use albanese_variety;
+Where H⁰(X, Ω¹)* is the dual of the space of holomorphic 1-forms (dimension g), and H₁(X, ℤ) is the first homology group (a lattice of rank 2g). The result is a complex torus ℂ^g / Λ with a Riemann form making it an abelian variety.
 
-// See examples/ directory for detailed usage
+**Period Matrix:**
+The lattice Λ is encoded as a g × 2g period matrix Π, where the first g columns are a basis for H⁰(X, Ω¹) evaluated on a symplectic basis of H₁, and the second g columns are their imaginary counterparts. The implementation stores this as a row-major `Vec<Vec<f64>>`.
+
+**Betti Number:**
+The first Betti number b₁ = 2g directly determines the torus dimension:
+
+```
+b₁(X) = rank H₁(X, ℤ) = 2g
+```
+
+**Albanese Map:**
+Given a base point p₀ ∈ X, the Albanese map sends p ∈ X to the class of the path integral:
+
+```
+alb(p) = [∫_{p₀}^{p} ω₁, ∫_{p₀}^{p} ω₂, ..., ∫_{p₀}^{p} ωg] ∈ ℂ^g / Λ
+```
+
+The implementation uses a simplified identity map for the placeholder, with the base point set to the origin.
+
+**Key properties:**
+- dim Alb(X) = h^{1,0}(X) = genus g
+- Alb(X) is dual to Pic⁰(X) (Picard variety)
+- The Albanese map is universal for morphisms to abelian varieties
+
+## Quick Start
+
+```rust
+fn main() {
+    let torus = ComplexTorus::new(2);
+    assert_eq!(torus.dimension, 2);
+    assert_eq!(torus.period_matrix.len(), 2);
+
+    assert_eq!(betti_number(3), 6);
+
+    let map = AlbaneseMap::new(2);
+    let result = map.map(&[1.0, 2.0, 3.0]);
+    assert_eq!(result.len(), 2);
+}
 ```
 
 ## API
 
-- `ComplexTorus` (lib.rs)
-- `betti_number` (lib.rs)
-- `albanese_dimension` (lib.rs)
-- `AlbaneseMap` (lib.rs)
+| Type/Function | Description |
+|---------------|-------------|
+| `ComplexTorus` | ℂ^g / Λ with period matrix |
+| `ComplexTorus::new` | Identity period matrix |
+| `betti_number` | `genus → 2 × genus` |
+| `albanese_dimension` | `genus → genus` (h^{1,0}) |
+| `AlbaneseMap` | Canonical map X → Alb(X) |
+| `AlbaneseMap::map` | Project point to Albanese torus |
 
-## Architecture
+## Architecture Notes
 
-This crate is part of the **[SuperInstance](https://github.com/SuperInstance)** ecosystem — a conservation-law-based framework for fleet coordination, ternary computation, and distributed agent systems.
+The Albanese variety provides the **geometric invariant theory** foundation for certain SuperInstance fleet topology computations. Within γ + η = C, the period matrix structure informs how conservation-law observations on high-dimensional variety spaces (γ-layer sensor configurations) map to lower-dimensional abelian invariants (η-layer compressed representations).
 
-### Related Crates
-
-- [`superinstance-core`](https://github.com/SuperInstance/superinstance-core) — Core conservation law (γ + η = C)
-- [`superinstance-harness`](https://github.com/SuperInstance/superinstance-harness) — Build harness and self-improving loop
-- [`fleet-coordinator`](https://github.com/SuperInstance/fleet-coordinator) — Fleet-level coordination
+See [ARCHITECTURE.md](https://github.com/SuperInstance/SuperInstance/blob/main/ARCHITECTURE.md).
 
 ## References
 
-- [SuperInstance Architecture](https://github.com/SuperInstance/SuperInstance/blob/main/ARCHITECTURE.md)
-- [Conservation Law Paper](https://github.com/SuperInstance/SuperInstance/blob/main/docs/conservation-law.md)
+1. Birkenhake, C. & Lange, H. (2004). *Complex Abelian Varieties*. 2nd ed. Springer. Chapter 11: Albanese and Picard Variety.
+2. Griffiths, P. & Harris, J. (1978). *Principles of Algebraic Geometry*. Wiley. Chapter 2: Riemann Surfaces and Period Matrices.
 
 ## License
 
